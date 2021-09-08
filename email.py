@@ -6,14 +6,85 @@ import os
 import pyautogui
 import pandas as pd
 from datetime import datetime
+import pyodbc
 import time
-import fsspec
+import warnings
+import numpy as np
 
+warnings.filterwarnings("ignore")
 
 
 username = "smokey@redbudroots.com"
 password = "Rep0rt$&!411"
 flowhub = 'flowhub_report'
+server = 'localhost\SQLEXPRESS'
+table = 'master'
+
+def blank(x):
+    if not x:
+        field = None
+    else:
+        field = x
+    return field
+
+def flowsql(servername,database):
+    conn =  pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};Server=' + servername + ';Database=' + database + ';Trusted_Connection=yes')
+    cursor = conn.cursor()
+
+    for row in range(1):
+        cursor.execute('''
+                INSERT INTO [dbo].[Flowhub] (brand,category,costPerItem,totalDiscountAmount,inventoryExpDate,itemSubtotal,location,price,productName,productType,
+                    quanitySold,receiptID,strainName,transactionDate,unitOfMeasure,saleYear,saleMonth,saleWeek,saleYrWeek) 
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                ''',
+                (
+                field1,     #brand
+                field2,     #category
+                field3,     #costPerItem
+                field4,     #totalDiscountAmount
+                field5,     #inventoryExpDate
+                field6,     #itemSubtotal
+                field7,     #location
+                field8,     #price
+                field9,     #productName
+                field10,    #productType
+                field11,    #quanitySold
+                field12,    #receiptID
+                field13,    #strainName
+                field14,    #transactionDate
+                field15,    #unitOfMeasure
+                field16,    #saleYear
+                field17,    #saleMonth
+                field18,    #saleWeek
+                field19,    #saleYrWeek
+                )
+            )
+
+        cursor.commit()
+
+
+def testing():
+    print('Brand: ' + str(field1))
+    print('Category: ' + field2)
+    print('Cost Per Item: ' + str(field3))
+    print('Total Discount Amount: ' + str(field4))
+    print('Inventory Exp Date: ' + str(field5))
+    print('Item Subtotal: ' + str(field6))
+    print('Location: ' + field7)
+    print('Price: ' + field8)
+    print('Product Name: ' + field9)
+    print('Product Type: ' + str(field10))
+    print('Quanity Sold: ' + str(field11))
+    print('Receipt ID: ' + field12)
+    print('Strain Name: ' + str(field13))
+    print('Transaction Date: ' + str(field14))
+    print('Unit Of Measure: ' + field15)
+    print('Sale Year: ' + str(field16))
+    print('Sale Month: ' + str(field17))
+    print('Sale Week: ' + str(field18))
+    print('Sale Yr Week: ' + str(field19))
+    print('\n')
+    
 
 def clean(text):
     # clean text for creating a folder
@@ -97,35 +168,35 @@ for i in range(messages, messages-N, -1):
 imap.close()
 imap.logout()
 
-time.sleep(3)
+def mouseMove():
+    #Clicks link
+    pyautogui.click(133,194,duration=0.75)
+    #Clicks Download
+    pyautogui.click(211,1010,duration=1.25)
+    #Clicks Open File
+    pyautogui.click(247,886,duration=2.00)
+    #pyautogui.hotkey('win', 'up')
+    #Clicks FILE in Excel
+    pyautogui.click(25,48,duration=2.00)
+    #Clicks SaveAs in Excel
+    pyautogui.click(69,317,duration=0.75)
+    #Clicks File Name and enters file name
+    pyautogui.click(687,153,duration=0.75)
+    pyautogui.typewrite(flowhub)
+    #Saves
+    pyautogui.click(1261,171,duration=0.75)
+    #Close Excel
+    pyautogui.click(1887,22,duration=0.75)
 
-#Clicks link
-pyautogui.click(153,246,duration=0.75)
-#Clicks Download
-pyautogui.click(275,992,duration=1.25)
-#Clicks Open File
-pyautogui.click(320,844,duration=2.00)
+mouseMove()
+time.sleep(5)
 
-#pyautogui.click(1020,1050,duration=2.00)
-#pyautogui.hotkey('win', 'up')
-
-
-
-#Clicks FILE in Excel
-pyautogui.click(33,66,duration=2.00)
-#Clicks SaveAs in Excel
-pyautogui.click(91,402,duration=0.75)
-#Clicks File Name and enters file name
-pyautogui.click(702,190,duration=0.75)
-pyautogui.typewrite(flowhub)
-#Saves
-pyautogui.click(1581,222,duration=0.75)
-time.sleep(3)
-file = pd.read_csv ("C://Users//Gonzalez//Downloads//flowhub_report.csv")   
-df = pd.DataFrame(file, columns= ['Brand','Category','Cost Per Item','Total Discount Amount',
-    'Inventory Exp Date','Item Subtotal','Location','Price','Product Name','Product Type','Quantity Sold', 'Price',
+data = pd.read_csv(r'C:\Users\rbgonzalez\Downloads\flowhub_report.csv')   
+df = pd.DataFrame(data, columns= ['Brand','Category','Cost Per Item','Total Discount Amount',
+    'Inventory Exp Date','Item Subtotal','Location','Price','Product Name','Product Type','Quantity Sold',
     'Receipt ID','Strain Name','Transaction Date','Unit of Measure'])
 
+#Converts dates to datetime datatype
 date = df['Transaction Date'][0]
 datetime_obj = datetime.strptime(date,'%m/%d/%Y %H:%M')
 
@@ -137,19 +208,89 @@ month = datetime_obj.month
 day = datetime_obj.day
 #Sale week
 #Sale Yr Week
-datetime_obj.isocalendar()[1]
+saleYrWeek = datetime_obj.isocalendar()[1]
 
-for i in df['Transaction Date']:
-    datetime_obj = datetime.strptime(i,'%m/%d/%Y %H:%M')
-    month = datetime_obj.month
-    day = datetime_obj.day
-    year = datetime_obj.year
-       
-    week_number = datetime_obj.isocalendar()[1]
+#Calulates how many rows are in the file for the loop
+index = df.index
+rows = len(index)
+
+#Loops in Inventory Exp Date and converts dates to datetime datatype
+
+#if rows != 0:
+    #i = 0
+
+for i in range(rows):
+   
+
+    if pd.isnull(df['Inventory Exp Date'][i]) == True:
+        #df['Inventory Exp Date'][i] = None 
+        pass
+    else:
+        date = df['Inventory Exp Date'][i]
+        itest = datetime.strptime(date,'%m/%d/%Y')
+        df['Inventory Exp Date'][i] = itest
+
+    #Pulls Sale dates from Transaction Date and creates new columns
     
     df['Sale Year'] = year
     df['Sale Month'] = month
-    df['Sale Yr Week'] = week_number
+    df['Sale Week'] = day
+    df['Sale Yr Week'] = saleYrWeek
 
-print(df)
-df.to_excel('smokey.xlsx',index=False) 
+    #Converts Transaction Date to datetime for SQL
+    
+    date = df['Transaction Date'][i]
+    tdate = datetime.strptime(date,'%m/%d/%Y %H:%M')
+    df['Transaction Date'][i] = tdate
+
+    
+    #Creates fields for SQL entry
+
+    field1   = df['Brand'].values[i]
+    field2   = df['Category'].values[i]
+    field3   = df['Cost Per Item'].values[i]
+    field4   = df['Total Discount Amount'][i]    
+    field5   = df['Inventory Exp Date'].values[i]       
+    field6   = df['Item Subtotal'].values[i]
+    field7   = df['Location'].values[i]
+    field8   = df['Price'].values[i]
+    field9   = df['Product Name'].values[i]
+    field10  = df['Product Type'].values[i]
+    field11  = df['Quantity Sold'].values[i]
+    field12  = df['Receipt ID'].values[i]
+    field13  = df['Strain Name'].values[i]
+    field14  = df['Transaction Date'].values[i]
+    field15  = df['Unit of Measure'].values[i]
+    field16  = df['Sale Year'].values[i]
+    field17  = df['Sale Month'].values[i]
+    field18  = df['Sale Week'].values[i]
+    field19  = df['Sale Yr Week'].values[i]
+
+    field1 = str(field1)
+    field3 = format(field3,'.2f')
+    field6 = format(field6,'.2f')
+    field8  = format(field8,'.2f')
+    field10 = str(field10)
+    field11 = int(field11)
+    field13 = str(field13)
+    field16 = int(field16)
+    field17 = int(field17)
+    field18 = int(field18)
+    field19 = int(field19)
+    
+    if np.isnan(field4) == True:
+        field4 = None
+    else:
+        pass
+
+    if pd.isnull(df['Inventory Exp Date'][i]) == True:
+        field5 = None
+    else:
+        pass
+
+    #print(i)
+    #testing()
+    flowsql(server,table)
+
+df.to_excel('smokey.xlsx',index=False)
+os.remove(r"C:\Users\rbgonzalez\Downloads\flowhub_report.csv")

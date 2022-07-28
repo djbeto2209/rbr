@@ -14,8 +14,8 @@ import numpy as np
 warnings.filterwarnings("ignore")
 
 
-username = "smokey@redbudroots.com"
-password = "Rep0rt$&!411"
+username = email_address
+password = password
 flowhub = 'flowhub_report'
 server = 'localhost\SQLEXPRESS'
 table = 'master'
